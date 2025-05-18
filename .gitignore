@@ -1,0 +1,5 @@
+# Ignore common virtualenv folders
+venv/
+.env/
+.venv/
+env/
