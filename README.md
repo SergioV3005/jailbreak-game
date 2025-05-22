@@ -10,3 +10,5 @@ Next steps:
 
 * Create other levels, trying with bigger models or more elaborated prompts.
 * Improve interface -> make it dynamic and not static
+* Add guide to the readme
+* Restructure the repository adequately
