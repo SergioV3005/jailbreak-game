@@ -148,7 +148,7 @@ export default function Home() {
 
           {/* Right Panel: Difficulty and Secret */}
           <div className="w-full md:w-1/4 pl-0 md:pl-4 flex flex-col pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-gray-200">
-            <div className="mb-6 text-left">
+            {/* <div className="mb-6 text-left">
               <label htmlFor="difficulty" className="block text-gray-700 text-sm font-bold mb-2">
                 Choose Difficulty:
               </label>
@@ -163,7 +163,7 @@ export default function Home() {
                 <option value="medium">Medium</option>
                 <option value="hard">Hard</option>
               </select>
-            </div>
+            </div>*/}
 
             <div className="mb-6 text-left">
               <label htmlFor="secret_input" className="block text-gray-700 text-sm font-bold mb-2">
