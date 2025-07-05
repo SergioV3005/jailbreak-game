@@ -10,20 +10,23 @@ const loadPrompt = (level: string) => {
 
 export async function POST(req: NextRequest) {
     try {
-        const { user_input, level } = await req.json();
+        const { messages, level } = await req.json(); // Changed to receive messages array
 
-        if (!user_input || !level) {
-            return NextResponse.json({ error: 'Missing user_input or level' }, { status: 400 });
+        if (!messages || !level) {
+            return NextResponse.json({ error: 'Missing messages or level' }, { status: 400 });
         }
 
         const system_prompt = loadPrompt(level);
 
+        // Construct the messages payload for Ollama, ensuring the system prompt is first
+        const ollamaMessages = [
+            { role: 'system', content: system_prompt },
+            ...messages.filter((msg: any) => msg.role !== 'system') // Filter out any system roles from frontend messages
+        ];
+
         const response = await ollama.chat({
             model: 'llama3.2:1b',
-            messages: [
-                { role: 'system', content: system_prompt },
-                { role: 'user', content: user_input }
-            ],
+            messages: ollamaMessages,
             stream: false
         });
 
