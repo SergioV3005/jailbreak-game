@@ -7,7 +7,8 @@ interface Message {
 }
 
 export default function Home() {
-  const [level, setLevel] = useState("easy");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [level, _] = useState("easy");
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [secretRevealed, setSecretRevealed] = useState<boolean | null>(null);
@@ -112,7 +113,7 @@ export default function Home() {
           </h1>
           <h3 className="lg:text-2xl text-m font-bold text-gray-500 mb-6 sm:mb-8">
             {" "}
-            The computer knows a secret, but won't tell you what it is.
+            The computer knows a secret, but won&apos;t tell you what it is.
             Unless...{" "}
           </h3>
         </div>

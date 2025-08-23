@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
         // Construct the messages payload for Ollama, ensuring the system prompt is first
         const ollamaMessages = [
             { role: 'system', content: system_prompt },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...messages.filter((msg: any) => msg.role !== 'system') // Filter out any system roles from frontend messages
         ];
 
