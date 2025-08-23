@@ -1,19 +1,20 @@
-'use client';
-import { useState, useRef, useEffect } from 'react';
+"use client";
+import { useState, useRef, useEffect } from "react";
 
 interface Message {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
 }
 
 export default function Home() {
-  const [level, setLevel] = useState('easy');
-  const [userInput, setUserInput] = useState('');
+  const [level, setLevel] = useState("easy");
+  const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [secretRevealed, setSecretRevealed] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [secretInput, setSecretInput] = useState(''); // New state for secret input
+  const [secretInput, setSecretInput] = useState(""); // New state for secret input
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isTyping, setIsTyping] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -34,17 +35,24 @@ export default function Home() {
 
     setIsLoading(true);
     setSecretRevealed(null);
+    setIsTyping(true);
 
-    setMessages((prevMessages) => [...prevMessages, { role: 'user', content: userInput }]);
-    setUserInput(''); // Clear input field
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { role: "user", content: userInput },
+    ]);
+    setUserInput(""); // Clear input field
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
+      const response = await fetch("/api/chat", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ messages: [...messages, { role: 'user', content: userInput }], level }),
+        body: JSON.stringify({
+          messages: [...messages, { role: "user", content: userInput }],
+          level,
+        }),
       });
 
       if (!response.ok) {
@@ -53,18 +61,24 @@ export default function Home() {
 
       const data = await response.json();
       const llmResponseContent = data.response;
-      setMessages((prevMessages) => [...prevMessages, { role: 'assistant', content: llmResponseContent }]);
-
-      // Remove secret check from here
-
-    } catch (error) {
-      console.error('Failed to submit:', error);
       setMessages((prevMessages) => [
         ...prevMessages,
-        { role: 'assistant', content: 'Error: Could not get response from LLM.' },
+        { role: "assistant", content: llmResponseContent },
+      ]);
+
+      // Remove secret check from here
+    } catch (error) {
+      console.error("Failed to submit:", error);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          role: "assistant",
+          content: "Error: Could not get response from LLM.",
+        },
       ]);
     } finally {
       setIsLoading(false);
+      setIsTyping(false);
     }
   };
 
@@ -82,7 +96,7 @@ export default function Home() {
         setSecretRevealed(false);
       }
     } catch (error) {
-      console.error('Failed to load secret:', error);
+      console.error("Failed to load secret:", error);
       setSecretRevealed(false); // Indicate failure to load/check
     } finally {
       setIsLoading(false);
@@ -90,32 +104,44 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen py-2 bg-gray-100 p-4">
-      <main className="flex flex-col items-center w-full flex-grow text-center">
-        <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6 sm:mb-8">
-          🧠 Jailbreak the LLM
-        </h1>
-
+    <div className="flex flex-col items-center min-h-screen py-8 bg-gray-100 px-4">
+      <main className="flex flex-col items-center w-full flex-grow text-center py-10">
+        <div className="flex flex-col gap-4">
+          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900">
+            🧠 Find the secret!
+          </h1>
+          <h3 className="lg:text-2xl text-m font-bold text-gray-500 mb-6 sm:mb-8">
+            {" "}
+            The computer knows a secret, but won't tell you what it is.
+            Unless...{" "}
+          </h3>
+        </div>
         <div className="flex flex-col md:flex-row w-full max-w-5xl bg-white p-4 sm:p-8 rounded-lg shadow-md flex-grow overflow-hidden">
           {/* Left Panel: Conversation */}
           <div className="flex flex-col flex-grow md:w-3/4 relative mb-4 md:mb-0 md:mr-4">
-            <div className="flex-grow overflow-y-auto pr-2 sm:pr-4 pb-4 md:border-r md:border-gray-200 min-h-0">
-              <p className="text-lg font-bold mb-4 text-left text-gray-800">Conversation:</p>
+            <div className="flex-grow overflow-y-auto pr-2 sm:pr-4 pb-4 md:border-r md:border-gray-200 h-96">
+              <p className="text-lg font-bold mb-4 text-left text-gray-800">
+                Conversation:
+              </p>
               {messages.map((msg, index) => (
                 <div
                   key={index}
-                  className={`flex mb-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className={`flex mb-2 ${
+                    msg.role === "user" ? "justify-end" : "justify-start"
+                  }`}
                 >
                   <div
-                    className={`rounded-lg p-3 max-w-[80%] ${msg.role === 'user'
-                      ? 'bg-blue-500 text-white text-right' // Added text-right
-                      : 'bg-gray-200 text-gray-800 text-left' // Added text-left
+                    className={`rounded-lg p-3 max-w-[80%] ${
+                      msg.role === "user"
+                        ? "bg-blue-500 text-white text-right" // Added text-right
+                        : "bg-gray-200 text-gray-800 text-left" // Added text-left
                     }`}
                   >
                     {msg.content}
                   </div>
                 </div>
               ))}
+              {isTyping && <TypingIndicator />}
               <div ref={messagesEndRef} />
             </div>
 
@@ -129,7 +155,7 @@ export default function Home() {
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     handleSubmit();
                   }
                 }}
@@ -166,7 +192,10 @@ export default function Home() {
             </div>*/}
 
             <div className="mb-6 text-left">
-              <label htmlFor="secret_input" className="block text-gray-700 text-sm font-bold mb-2">
+              <label
+                htmlFor="secret_input"
+                className="block text-gray-700 text-sm font-bold mb-2"
+              >
                 Submit Secret:
               </label>
               <input
@@ -177,7 +206,7 @@ export default function Home() {
                 value={secretInput}
                 onChange={(e) => setSecretInput(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     handleSecretCheck();
                   }
                 }}
@@ -196,9 +225,13 @@ export default function Home() {
             {secretRevealed !== null && (
               <div className="mt-4">
                 {secretRevealed ? (
-                  <p className="text-green-600 font-bold text-sm sm:text-base">🎉 Secret revealed! You successfully jailbroke the model.</p>
+                  <p className="text-green-600 font-bold text-sm sm:text-base">
+                    🎉 Secret revealed! You successfully jailbroke the model.
+                  </p>
                 ) : (
-                  <p className="text-red-600 font-bold text-sm sm:text-base">❌ Try again. The LLM is resisting...</p>
+                  <p className="text-red-600 font-bold text-sm sm:text-base">
+                    ❌ Try again. Remember: every detail matters!
+                  </p>
                 )}
               </div>
             )}
@@ -208,3 +241,15 @@ export default function Home() {
     </div>
   );
 }
+
+const TypingIndicator = () => (
+    <div className="flex justify-start mb-2">
+      <div className="bg-gray-200 text-gray-800 rounded-lg p-3 max-w-[80%]">
+        <div className="flex space-x-1">
+          <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+          <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+          <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+        </div>
+      </div>
+    </div>
+);
