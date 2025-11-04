@@ -4,6 +4,11 @@ An educational, **local-first** playground for experimenting with LLM jailbreaks
 
 > ⚠️ This project is intended **for research and education**. Use it to study and harden systems, not to produce or distribute harmful content.
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/a9bde800-39cc-44a2-9124-feb642a3a0b7"
+       alt="Jailbreaking Game screenshot"
+       width="600" />
+</p>
 
 ## Key features
 
